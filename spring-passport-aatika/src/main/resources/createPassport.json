@@ -1,0 +1,15 @@
+{
+    "applicationId": 1,
+    "name":"Aatika",
+    "fatherName": "Mohd",
+    "dateOfBirth": 544892085807,
+    "gender": "FEMALE",
+    "address": "Hyd",
+    "phone": "1234567890",
+    "email": "aatika08@gmail.com",
+     "addressProofDoc": "AADHAAR",
+    "photoIdProofDoc": "DRIVING_LICENSE",
+    "applicationStatus":"DRAFT"
+   
+    
+}
