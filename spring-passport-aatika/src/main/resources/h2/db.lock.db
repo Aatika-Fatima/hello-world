@@ -1,0 +1,6 @@
+#FileLock
+#Tue Jun 27 15:34:01 IST 2017
+hostName=192.168.56.1
+id=15ce90200cce06f1a7f5558187cafd940b635b0ee50
+method=file
+server=192.168.56.1\:58008

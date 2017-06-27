@@ -10,12 +10,16 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 @Entity
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
+@NamedQueries({ @NamedQuery(name = "findDocumentByApplicationId", query = "SELECT p FROM Passport p where p.applicationId = :applicationId"),
+	@NamedQuery(name = "updatePassport", query = "UPDATE Passport p set p.photoURL=:photoURL,p.addressProofDocNumber =:addressProofDocNumber, p.addressProofDocFileUrl =:addressProofDocFileUrl,p.photoIdProofDocNumber=:photoIdProofDocNumber,p.photoIdProofDocUrl=:photoIdProofDocUrl where p.applicationId=:applicationId") })
 public class Passport {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -219,6 +223,17 @@ public class Passport {
 
 	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
+	}
+
+	@Override
+	public String toString() {
+		return "Passport [id=" + id + ", applicationId=" + applicationId + ", name=" + name + ", fatherName="
+				+ fatherName + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", address=" + address
+				+ ", phone=" + phone + ", email=" + email + ", applicationStatus=" + applicationStatus
+				+ ", addressProofDoc=" + addressProofDoc + ", photoIdProofDoc=" + photoIdProofDoc + ", photoURL="
+				+ photoURL + ", addressProofDocNumber=" + addressProofDocNumber + ", addressProofDocFileUrl="
+				+ addressProofDocFileUrl + ", photoIdProofDocNumber=" + photoIdProofDocNumber + ", photoIdProofDocUrl="
+				+ photoIdProofDocUrl + ", lastModified=" + lastModified + "]";
 	}
 
  

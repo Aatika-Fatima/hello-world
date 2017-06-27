@@ -20,30 +20,32 @@ import com.example.passport.model.ApplicationStatus;
 import com.example.passport.model.Gender;
 import com.example.passport.model.Passport;
 import com.example.passport.model.PhotoProofDoc;
+import com.example.passport.repository.IPassportRepository;
 import com.example.passport.repository.PassportJpaRepository;
 import com.example.passport.util.SuccessMessage;
 
 @Service
 public class PassportService {
 	@Autowired
-	PassportJpaRepository passportJpaRepository;
+	IPassportRepository passportRepository;
 
 	@Transactional
 	public SuccessMessage saveDocuments(Passport p) {
-		passportJpaRepository.updatePassport(p.getPhotoURL(), p.getAddressProofDocNumber(),
-				p.getAddressProofDocFileUrl(), p.getPhotoIdProofDocNumber(), p.getPhotoIdProofDocUrl(),
-				p.getApplicationId());
-		p = passportJpaRepository.findDocumentByApplicationId(p.getApplicationId());
+		passportRepository.updatePassport(p.getPhotoURL(), p.getAddressProofDocNumber(), p.getAddressProofDocFileUrl(),
+				p.getPhotoIdProofDocNumber(), p.getPhotoIdProofDocUrl(), p.getApplicationId());
+		p = passportRepository.findDocumentByApplicationId(p.getApplicationId());
 		SuccessMessage successMessage = new SuccessMessage(1, "Documents Uploaded Successfuly", p.getApplicationId(),
 				p.getApplicationStatus());
 		return successMessage;
 	}
 
+	@Transactional
 	public SuccessMessage createPassport(Passport p) {
 		Passport passport = null;
 
 		try {
-			passport = passportJpaRepository.save(p);
+			passportRepository.create(p);
+			passport = passportRepository.findDocumentByApplicationId(p.getApplicationId());
 		} catch (RuntimeException ex) {
 			throw new PassportApplicationSaveException();
 		}
@@ -54,7 +56,7 @@ public class PassportService {
 	}
 
 	public Map<String, Object> getDocumentInfo(int applicationId) {
-		Passport p = passportJpaRepository.findDocumentByApplicationId(applicationId);
+		Passport p = passportRepository.findDocumentByApplicationId(applicationId);
 		if (p == null)
 			throw new ApplicationNotFoundException(applicationId);
 
@@ -68,7 +70,7 @@ public class PassportService {
 	}
 
 	public Passport getApplicationByApplicationId(Integer applicationId) {
-		Passport p = passportJpaRepository.findDocumentByApplicationId(applicationId);
+		Passport p = passportRepository.findDocumentByApplicationId(applicationId);
 		if (p == null)
 			throw new ApplicationNotFoundException(applicationId);
 		return p;

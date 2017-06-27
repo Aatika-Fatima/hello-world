@@ -1,22 +1,23 @@
 package com.example.passport.integration;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Calendar;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -30,13 +31,15 @@ import com.example.passport.model.ApplicationStatus;
 import com.example.passport.model.Gender;
 import com.example.passport.model.Passport;
 import com.example.passport.model.PhotoProofDoc;
-import com.example.passport.repository.PassportJpaRepository;
+import com.example.passport.repository.IPassportRepository;
 import com.example.passport.util.FailureMessage;
 
 @Transactional
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableSpringDataWebSupport
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+
 public class PassportIntegrationTests {
 	@Autowired
 	private WebApplicationContext webApplicationContext;
@@ -44,9 +47,10 @@ public class PassportIntegrationTests {
 	@Autowired
 	MockHttpServletRequest request;
 	@Autowired
-	PassportJpaRepository passportJpaRepository;
+	IPassportRepository passportRepository;
 	private MockMvc mockMvc;
 
+ 
 	@Before
 	public void setUp() {
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -61,10 +65,12 @@ public class PassportIntegrationTests {
 		 * request.setParameter("photoIdProofDocFile",
 		 * "http://www.example.com/Aadhar.jpg");
 		 */
-		testCreateApplicationDocument();
+		//testCreateApplicationDocument();
 	}
-
-	public void testCreateApplicationDocument() {
+	 
+	@Test
+	@Commit
+	public void a_testCreateApplicationDocument() {
 		Passport p = new Passport();
 		p.setAddress("T.chowki");
 		p.setApplicationId(1);
@@ -89,7 +95,7 @@ public class PassportIntegrationTests {
 		p.setPhotoIdProofDocUrl("http://www.example.com/photoURL.docx");
 		p.setLastModified(Calendar.getInstance().getTime());
 
-		passportJpaRepository.saveAndFlush(p);
+		passportRepository.create(p);
 	}
 
 	@Test
@@ -100,7 +106,7 @@ public class PassportIntegrationTests {
 
 			resultActions.andExpect(status().isOk());
 			MvcResult mvcResult = mockMvc.perform(get("/passport/getapplication/{applicationId}", 1)).andReturn();
-			mvcResult.equals(passportJpaRepository.findDocumentByApplicationId(1));
+			mvcResult.equals(passportRepository.findDocumentByApplicationId(1));
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
