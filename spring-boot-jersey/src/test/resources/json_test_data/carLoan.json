@@ -1,0 +1,23 @@
+{
+    "carCondition": "NEW_CAR",
+    "carInfo": "MARUTI",
+    "state": {
+         "state": "TELANGANA",
+        "country": {
+             "shortName": "IN",
+            "name": "INDIA",
+            "phoneCode": "+91"
+        }
+    },
+    "city": {
+        "name": "HYDERABAD",
+        "state": {
+             "state": "TELANGANA",
+            "country": {
+                 "shortName": "IN",
+                "name": "INDIA",
+                "phoneCode": "+91"
+            }
+        }
+    }
+}

@@ -1,0 +1,102 @@
+{
+"applicantFirstName":"Aatika",
+"applicantLastName":"Fatima",
+"applicantEmail":"aatika08@gmail.com",
+"applicantMobile":"+91-8977813009",
+"applicantGender":"FEMALE",
+"fathersFirstName":"Jaweed",
+"fathersLastName":"Khan",
+"applicantPermAdd":{
+	
+		"pincode":"500008",
+		"doorNo":"11-1-213",
+		"streetAddress":"asdf",
+		"landMark":"Maruti Suzuki",
+	
+	 "city": {
+        "name": "HYDERABAD",
+        "state": {
+             "state": "TELANGANA",
+            "country": {
+                 "shortName": "IN",
+                "name": "INDIA",
+                "phoneCode": "+91"
+            }
+        }
+    
+	}
+},
+"applicantCurrAdd":{
+ 		"pincode":"500008",
+		"doorNo":"11-1-213",
+		"streetAddress":"asdf",
+		"landMark":"Maruti Suzuki",
+	
+	 "city": {
+        "name": "HYDERABAD",
+        "state": {
+             "state": "TELANGANA",
+            "country": {
+                 "shortName": "IN",
+                "name": "INDIA",
+                "phoneCode": "+91"
+            }
+        }
+    }
+	
+},
+"loanAmountReq":"10000",
+"tenureLoanYears":"1",
+"tenureLoanMonths":"3",
+"courseLevel":"BACHELORS",
+"studyCountry":"AUSTRALIA",
+"studyCourse":"ENGINEERING_MS",
+"courseDuration":"1",
+"coBorrowerFirstName":"Jack",
+"coBorrowerLastName":"Chan",
+"coBorrowerMobile":"123456789",
+"coBorrowerGender":"MALE",
+"coBorrowerFathersFirstName":"Tom",
+"coBorrowerFathersLastName":"Jerry",
+"coBorrowerPermAdd":{
+ 		"pincode":"500008",
+		"doorNo":"11-1-213",
+		"streetAddress":"asdf",
+		"landMark":"Maruti Suzuki",
+	
+	 "city": {
+        "name": "HYDERABAD",
+        "state": {
+             "state": "TELANGANA",
+            "country": {
+                 "shortName": "IN",
+                "name": "INDIA",
+                "phoneCode": "+91"
+            }
+        }
+    }
+	
+},
+"coBorrowerCurrAdd": {
+ 		"pincode":"500008",
+		"doorNo":"11-1-213",
+		"streetAddress":"asdf",
+		"landMark":"Maruti Suzuki",
+	
+	 "city": {
+        "name": "HYDERABAD",
+        "state": {
+             "state": "TELANGANA",
+            "country": {
+                 "shortName": "IN",
+                "name": "INDIA",
+                "phoneCode": "+91"
+            }
+        }
+    }
+	
+},
+"studentRelationship":"BROTHER",
+"employmentType":"SALARIED",
+"provideCollateral":"YES"
+}
