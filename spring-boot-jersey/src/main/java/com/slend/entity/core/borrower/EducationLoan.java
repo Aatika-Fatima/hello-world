@@ -12,8 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.slend.entity.validator.core.borrower.ValidEmploymentType;
+import com.slend.entity.validator.core.borrower.CheckEmploymentType;
 
+ 
 @Entity
 @Table(name = "s1_educationloan")
 public class EducationLoan {
@@ -86,6 +87,7 @@ public class EducationLoan {
 
  	@Column(columnDefinition="VARCHAR(30)")
 	@Enumerated(EnumType.STRING)
+ 	@CheckEmploymentType
 	private EmploymentType employmentType; 
 	
 	@Column(columnDefinition="VARCHAR(30)")

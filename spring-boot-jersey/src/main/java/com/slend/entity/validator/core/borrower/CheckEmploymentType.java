@@ -17,7 +17,7 @@ import javax.validation.Payload;
 @Retention(RUNTIME)
 @Constraint(validatedBy = EmploymentTypeConstraintValidator.class)
 @Documented
-public @interface ValidEmploymentType {
+public @interface CheckEmploymentType {
     String message() default "Employment Type should be SALARIED | NON_SALARIED";
 
     Class<?>[] groups() default {};
