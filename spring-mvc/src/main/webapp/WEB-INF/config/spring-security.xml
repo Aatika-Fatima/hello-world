@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.1.xsd">
+
+	<import resource="classpath:spring/application-config.xml" />
+
+	<security:http auto-config="true" use-expressions="true">
+		<security:csrf disabled="true" />
+		<security:intercept-url pattern="/authentication/**"
+			access="permitAll" />
+		<security:intercept-url pattern="/badUser1"
+			access="permitAll" />
+		<security:intercept-url pattern="/resendRegistrationEmail.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/savePassword.htm"
+			access="hasAuthority('CHANGE_PASSWORD_PRIVILEGE')" />
+
+		<security:intercept-url pattern="/resetPassword.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/authenticaton/updatePassword"
+			access="hasAuthority('CHANGE_PASSWORD_PRIVILEGE')" />
+
+		<security:intercept-url pattern="/updatePassword.htm"
+			access="hasAuthority('CHANGE_PASSWORD_PRIVILEGE')" />
+
+		<security:intercept-url pattern="/changePassword.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/resetPassword.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/resendRegistrationToken.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/error/**"
+			access="permitAll" />
+		<security:intercept-url pattern="/login.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/testJQuery.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/adminHome.htm"
+			access="isAuthenticated()" />
+		<security:intercept-url pattern="/admin/**"
+			access="hasAuthority('CREATE_USER')" />
+			
+		<security:intercept-url pattern="/jk" access="hasAuthority('READ_USER')" />
+
+		<security:intercept-url pattern="/registerUser.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/main.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/resources/**"
+			access="permitAll" />
+		<security:intercept-url pattern="/failedLogin.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/questionBank.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/registrationConfirmation.htm"
+			access="permitAll" />
+		<security:intercept-url pattern="/successful"
+			access="permitAll" />
+		<security:intercept-url pattern="/**"
+			access="permitAll" />
+			
+		<security:intercept-url pattern="/addCategory.htm" access="hasAuthority('CREATE_CATEGORY')"/>
+		<security:intercept-url pattern="/403.htm"
+			access="permitAll" />
+
+		<security:access-denied-handler
+			error-page="/403.htm" />
+
+		<!-- <security:http-basic /> -->
+		<security:form-login login-page="/main.htm"
+			default-target-url="/successful?success=true"
+			always-use-default-target="true" login-processing-url="/j_spring_security_check"
+			username-parameter="j_username" password-parameter="j_password"
+			authentication-failure-handler-ref="authenticationFailureHandler"
+			authentication-success-handler-ref="myRequestHandler" />
+
+		<security:remember-me data-source-ref="dataSource"
+			token-validity-seconds="86400" remember-me-parameter="remember-me" />
+		<security:logout logout-url="/j_spring_security_logout"
+			delete-cookies="JSESSIONID" success-handler-ref="customLogoutSuccessHandler" />
+
+	</security:http>
+	<bean id="restAuthenticationEntryPointRef" class="com.example.service.security.RestAuthenticationEntryPoint"/>
+	<bean id="myRequestHandler" class="com.example.service.security.MySavedRequestAwareAuthenticationSuccessHandler"/>
+	<bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+		<property name="defaultLocale" value="en_US" />
+		<property name="cookieName" value="my-locale-cookie" />
+		<property name="cookieMaxAge" value="3600" />
+	</bean>
+	<bean id="customLogoutSuccessHandler" class="com.example.service.security.CustomLogoutSuccessHandler" />
+	<bean id="authnticationHandler"
+		class="com.example.service.security.MySimpleUrlAuthenticationSuccessHandler" />
+		
+	<bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler"/>
+	
+	<bean id="authenticationFailureHandler"
+		class="com.example.service.security.CustomAuthenticationFailureHandler" />
+
+	<!-- <bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider"> 
+		<property name="passwordEncoder" ref="passwordEncoder" /> <property name="userDetailsService" 
+		ref="userDetailsService" /> </bean> <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" 
+		/> <security:authentication-manager> <security:authentication-provider ref="daoAuthenticationProvider" 
+		/> </security:authentication-manager> <bean id="userDetailsService" class="com.example.service.security.MyUserDetailsService" 
+		/> -->
+	<!-- <security:authentication-manager> <security:authentication-provider 
+		user-service-ref="userDetailsService" /> </security:authentication-manager> -->
+
+
+	<bean id="userDetailsService" class="com.example.service.security.MyUserDetailsService" />
+	<bean id="loginAttemptService" class="com.example.service.security.LoginAttemptService" />
+
+
+	<!-- PersitentTokenBased -->
+
+	<bean id="rememberMeAuthenticationProvider"
+		class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
+		<constructor-arg value="myAppKey" />
+		<constructor-arg ref="jdbcTokenRepository" />
+		<constructor-arg ref="userDetailsService" />
+	</bean>
+
+	<!-- Uses a database table to maintain a set of persistent login data -->
+	<bean id="jdbcTokenRepository"
+		class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl">
+		<property name="createTableOnStartup" value="false" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<security:authentication-manager>
+		<security:authentication-provider
+			user-service-ref="userDetailsService">
+			<!-- <security:user-service> <security:user name="aatika" password="secret" 
+				authorities="ROLE_USER" /> <security:user name="fatima" password="secret" 
+				authorities="ROLE_USER" /> </security:user-service> -->
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+	<bean id="passwordEncoder"
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames" value="classpath:messages/message" />
+	</bean>
+	<!-- <security:authentication-manager> <security:authentication-provider 
+		user-service-ref="userDetailsService"> </security:authentication-provider> 
+		</security:authentication-manager> -->
+
+	<!-- <security:authentication-manager> <security:authentication-provider> 
+		<security:password-encoder hash="bcrypt" /> <security:jdbc-user-service data-source-ref="dataSource" 
+		/> </security:authentication-provider> </security:authentication-manager> -->
+
+	<!-- <bean id="userDetailsService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl"> 
+		<property name="dataSource" ref="dataSource"></property> </bean> -->
+</beans>
