@@ -1,0 +1,123 @@
+UserDetailsManager userDetailsManager;
+	AppUser admin, user, guest;
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+	 	http.authorizeRequests().accessDecisionManager(accessDecisionManager());
+	//	http.authorizeRequests().expressionHandler(webExpressionHandler());
+		http.csrf().disable();// .authorizeRequests().expressionHandler(customWebSecurityExpressionHandler())
+
+		http.authorizeRequests().antMatchers("/css/**", "/login").permitAll()
+
+				// .anyRequest().authenticated()
+				/*
+				 * .antMatchers("/home", "/main", "/logout") .authenticated()
+				 */
+
+				// .antMatchers("/admin/**/*").access("hasAuthority('ADMIN') and
+				// isFullyAuthenticated()")
+				// .antMatchers("/admin/**/*").fullyAuthenticated().
+				.antMatchers("/admin/**/*").hasAnyAuthority("ADMIN")
+
+				.antMatchers("/movies/adult/**/*").hasAnyAuthority("GUEST")
+				// .access("hasAuthority('GUEST')")//.accessDecisionManager(accessDecisionManager())
+				// .antMatchers("/admin/movies").hasAuthority("ADMIN").accessDecisionManager(accessDecisionManager())
+				// .antMatchers("/movies/adult/**/*").hasAuthority("ADMIN")
+
+				.and().formLogin().loginPage("/login").defaultSuccessUrl("/home").loginProcessingUrl("/login")
+				.failureUrl("/login?error=error").usernameParameter("username").passwordParameter("password")
+
+				.and().rememberMe().rememberMeCookieName("remember-me").tokenValiditySeconds(24 * 60 * 60)
+
+				// .rememberMe().rememberMeServices(rememberMeServices())
+
+				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/login?logout=true").invalidateHttpSession(true)
+				.deleteCookies("JSESSIONID");
+
+			//	.and().addFilter(digestAuthenticationFilter());
+
+	}
+
+	@Bean
+	public CustomInMemoryUserDetailsManager customInMemoryUserDetailsManager() {
+		SimpleGrantedAuthority adminAuthority = new SimpleGrantedAuthority("ADMIN");
+		SimpleGrantedAuthority userAuthority = new SimpleGrantedAuthority("USER");
+		SimpleGrantedAuthority guestAuthority = new SimpleGrantedAuthority("GUEST");
+
+		Collection<? extends GrantedAuthority> adminAuthorities = Arrays.asList(adminAuthority);
+		Collection<? extends GrantedAuthority> userAuthorities = Arrays.asList(userAuthority);
+		Collection<? extends GrantedAuthority> guestAuthorities = Arrays.asList(guestAuthority);
+
+		admin = new AppUser("aatika", "fatima", adminAuthorities, "Fatima", 20);
+		user = new AppUser("aaliya", "fatima", userAuthorities, "Fatima", 12);
+		guest = new AppUser("huma", "fatima", guestAuthorities, "Fatima", 20);
+		System.err.println(admin.getUsername() + " ====================== " + admin.getAge());
+		System.err.println(user.getUsername() + " ====================== " + user.getAge());
+		System.err.println(guest.getUsername() + " ====================== " + guest.getAge());
+
+		CustomInMemoryUserDetailsManager cc = new CustomInMemoryUserDetailsManager(Arrays.asList(admin, user, guest));
+
+		return cc;
+	}
+
+	@Bean
+	public RoleHierarchy roleHierarchy() {
+		RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+		roleHierarchy.setHierarchy("ROLE_ADMIN>ROLE_USER and ROLE_USER>ROLE_GUEST");
+		return roleHierarchy;
+	}
+
+	@Bean
+	public RoleHierarchyVoter roleHierarchyVoter() {
+		return new RoleHierarchyVoter(roleHierarchy());
+	}
+
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		//auth.userDetailsService(customInMemoryUserDetailsManager());
+		auth.inMemoryAuthentication().withUser("aatika").password("fatima").authorities("ADMIN");
+		auth.inMemoryAuthentication().withUser("aaliya").password("fatima").authorities("USER");
+		auth.inMemoryAuthentication().withUser("huma").password("fatima").authorities("GUEST");
+
+	}
+
+	@Bean
+	public CustomWebSecurityExpressionHandler customWebSecurityExpressionHandler() {
+		CustomWebSecurityExpressionHandler customWebSecurityExpressionHandler = new CustomWebSecurityExpressionHandler();
+		customWebSecurityExpressionHandler.setRoleHierarchy(roleHierarchy());
+		return customWebSecurityExpressionHandler;
+	}
+
+	@Bean
+	public AccessDecisionManager accessDecisionManager() {
+		WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
+		webExpressionVoter.setExpressionHandler(webExpressionHandler());
+		// webExpressionVoter.setExpressionHandler(customWebSecurityExpressionHandler());
+
+		List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<>();
+		//decisionVoters.add(roleHierarchyVoter());
+			decisionVoters.add(webExpressionVoter);
+
+		// decisionVoters.add(new AuthenticatedVoter());
+		return new UnanimousBased(decisionVoters);
+	}
+
+	@Bean
+	public DigestAuthenticationEntryPoint digestAuthenticationEntryPoint() {
+		DigestAuthenticationEntryPoint digestAuthenticationEntryPoint = new DigestAuthenticationEntryPoint();
+		digestAuthenticationEntryPoint.setKey("secretKey!@#");
+		digestAuthenticationEntryPoint.setRealmName("Digest Authentication Realm");
+		return digestAuthenticationEntryPoint;
+	}
+
+	private SecurityExpressionHandler<FilterInvocation> webExpressionHandler() {
+		DefaultWebSecurityExpressionHandler defaultWebSecurityExpressionHandler = new DefaultWebSecurityExpressionHandler();
+		defaultWebSecurityExpressionHandler.setRoleHierarchy(roleHierarchy());
+		return defaultWebSecurityExpressionHandler;
+	}
+
+	public DigestAuthenticationFilter digestAuthenticationFilter() {
+		DigestAuthenticationFilter digestAuthentiationFilter = new DigestAuthenticationFilter();
+		digestAuthentiationFilter.setAuthenticationEntryPoint(digestAuthenticationEntryPoint());
+		return digestAuthentiationFilter;
+	}
