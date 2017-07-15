@@ -33,32 +33,29 @@ import com.security.web.model.AppUser;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	UserDetailsManager userDetailsManager;
-	UserDetails admin, user1, user2;
+	AppUser admin, user, guest;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests().accessDecisionManager(accessDecisionManager());
 		http.csrf().disable().authorizeRequests().expressionHandler(customWebSecurityExpressionHandler())
-				.antMatchers("/css/**", "/login").permitAll().antMatchers("/", "/home", "/main", "/logout")
+				.antMatchers("/css/**", "/login", "/webjars/**").permitAll().antMatchers("/", "/home", "/main", "/logout")
 				.authenticated()
 
 				.antMatchers("/admin/dashboard").fullyAuthenticated().antMatchers("/admin/dashboard")
 				.hasAuthority("ADMIN")
 
-				.antMatchers("/admin/movies").fullyAuthenticated()
-				.antMatchers("/admin/movies").access("hasAuthority('ADMIN') and hasAgeOver18()")
-				.accessDecisionManager(accessDecisionManager())
-				//.antMatchers("/admin/movies").hasAuthority("ADMIN").accessDecisionManager(accessDecisionManager())
+				.antMatchers("/admin/movies")
+				.access("hasAuthority('ADMIN') and hasAgeOver18() and hasAuthority('IS_FULLY_AUTHENTICATED')")
 
-			 
 				.and().formLogin().loginPage("/login").defaultSuccessUrl("/home").loginProcessingUrl("/login")
-				.failureUrl("/login?error=error").usernameParameter("username").passwordParameter("password")
+				.failureUrl("/login?error=error").usernameParameter("username").passwordParameter("password").permitAll()
 
 				.and().rememberMe().rememberMeCookieName("remember-me").tokenValiditySeconds(24 * 60 * 60)
 
-				// .rememberMe().rememberMeServices(rememberMeServices())
-
+ 
 				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/login?logout=true").invalidateHttpSession(true)
-				.deleteCookies("JSESSIONID")
+				.deleteCookies("JSESSIONID").permitAll()
 
 				.and().addFilter(digestAuthenticationFilter());
 
@@ -68,16 +65,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public CustomInMemoryUserDetailsManager customInMemoryUserDetailsManager() {
 		SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ADMIN");
 		Collection<? extends GrantedAuthority> authorities = Arrays.asList(simpleGrantedAuthority);
-		AppUser appUser = new AppUser("aatika", "fatima", authorities, "Fatima", 12);
-		System.err.println(appUser.getUsername() +" ====================== " + appUser.getAge());
-		CustomInMemoryUserDetailsManager cc = new CustomInMemoryUserDetailsManager(Arrays.asList(appUser));
+		admin = new AppUser("aatika", "fatima", authorities, "Fatima", 12);
+		System.err.println(admin.getUsername() + " ====================== " + admin.getAge());
+
+		
+		CustomInMemoryUserDetailsManager cc = new CustomInMemoryUserDetailsManager(Arrays.asList(admin));
+
 		return cc;
 	}
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// auth.inMemoryAuthentication().withUser("aatika").password("fatima").authorities("USER");
-		// auth.userDetailsService(userDetailsManager);
 		auth.userDetailsService(customInMemoryUserDetailsManager());
 	}
 
@@ -85,36 +83,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public CustomWebSecurityExpressionHandler customWebSecurityExpressionHandler() {
 		return new CustomWebSecurityExpressionHandler();
 	}
-
-	@Bean
-	public PersistentTokenBasedRememberMeServices rememberMeServices() {
-		admin = new User("aatika", "fatima", Arrays.asList(new SimpleGrantedAuthority("USER"),
-				new SimpleGrantedAuthority("readonly"), new SimpleGrantedAuthority("readwrite")));
-
-		user1 = new User("aaliya", "fatima",
-				Arrays.asList(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("readwrite")));
-
-		UserDetails user2 = new User("humaira", "fatima", Arrays.asList(new SimpleGrantedAuthority("USER")));
-
-		userDetailsManager = new InMemoryUserDetailsManager(Arrays.asList(admin, user1, user2));
-
-		PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices("secret",
-				userDetailsManager, new InMemoryTokenRepositoryImpl());
-		rememberMeServices.setTokenValiditySeconds(60 * 60 * 24);
  
-		return rememberMeServices;
-	}
 
 	@Bean
 	public AccessDecisionManager accessDecisionManager() {
 		WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
 		webExpressionVoter.setExpressionHandler(customWebSecurityExpressionHandler());
-		List<AccessDecisionVoter<? extends Object>> decisionVoters = Arrays.asList(
-				webExpressionVoter,
-				new RoleVoter(), new AuthenticatedVoter());
+		List<AccessDecisionVoter<? extends Object>> decisionVoters =
+				Arrays.asList(
+				webExpressionVoter, new RoleVoter(),
+				new AuthenticatedVoter());
 		return new UnanimousBased(decisionVoters);
 	}
-  
 
 	@Bean
 	public DigestAuthenticationEntryPoint digestAuthenticationEntryPoint() {

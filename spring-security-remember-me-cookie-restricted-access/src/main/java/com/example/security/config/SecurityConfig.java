@@ -78,12 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices("secret",
 				userDetailsManager, new InMemoryTokenRepositoryImpl());
 		rememberMeServices.setTokenValiditySeconds(60 * 60 * 24);
- 	/*	rememberMeServices.setParameter("remember-me-parameter");
-		rememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
-		rememberMeServices.setTokenValiditySeconds(60 * 60 * 24);
-		rememberMeServices.setCookieName("remember-me");*/
-	//	rememberMeServices.setTokenLength(32);
-	//	rememberMeServices.setAlwaysRemember(true);
+
 		return rememberMeServices;
 	}
 
@@ -95,14 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new UnanimousBased(decisionVoters);
 	}
 
-	@Bean
-	public AccessDecisionManager accessDecisionManager1() {
-		RoleVoter roleVoter = new RoleVoter();
-		AuthenticatedVoter authenticatedVoter = new AuthenticatedVoter();
-		List<AccessDecisionVoter<? extends Object>> decisionVoters = Arrays.asList(new WebExpressionVoter(), roleVoter,
-				authenticatedVoter);
-		return new UnanimousBased(decisionVoters);
-	}
+ 
 
 	@Bean
 	public DigestAuthenticationEntryPoint digestAuthenticationEntryPoint() {
